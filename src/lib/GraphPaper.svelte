@@ -1,0 +1,334 @@
+<script>
+	import { onMount } from 'svelte';
+
+	export let rows = 16;
+	export let cols = 16;
+
+	let x = 0;
+	let y = 0;
+	let colorIdx = 1;
+	let cmdIdx = -1;
+	let expectRepeat = false;
+	let inLoop = false;
+
+	let cmdList = [];
+
+	let grid = Array(cols * rows).fill(0);
+
+	onMount(async () => {
+		load();
+	});
+
+	const move = (dir) => {
+		switch(dir) {
+			case 'left':
+				if(x > 0)
+					x--;
+				break;
+			case 'right':
+				if(x < cols - 1)
+					x++;
+				break;
+			case 'up':
+				if(y > 0)
+					y--;
+				break;
+			case 'down':
+				if(y < rows - 1)
+					y++;
+				break;
+		}
+
+	}
+
+	const draw = () => {
+		grid[x + y * cols] = colorIdx;
+		grid = grid;
+	}
+
+	const changeColor = () => {
+		colorIdx = colorIdx % 2 + 1;
+	}
+
+	const clear = () => {
+		grid.fill(0);
+		colorIdx = 1;
+		x = 0;
+		y = 0;
+		cmdIdx = -1;
+		grid = grid;
+	}
+
+	const onKeyup = (evt) => {
+
+		let cmd = null;
+
+		if(expectRepeat && !isNaN(evt.key)) {
+			expectRepeat = false;
+			cmdList[cmdIdx].repeat = parseInt(evt.key);
+			inLoop = false;
+		}
+		else {
+			switch(evt.key) {
+				case 'ArrowUp':
+					cmd = {cmd: 'up'};
+					break;
+
+				case 'ArrowDown':
+					cmd = {cmd: 'down'};
+					break;
+
+				case 'ArrowLeft':
+					cmd = {cmd: 'left'};
+					break;
+
+				case 'ArrowRight':
+					cmd = {cmd: 'right'};
+					break;
+
+				case 'c':
+					cmd = {cmd: 'chgcol'};
+					break;
+
+				case 'm':
+					cmd = {cmd: 'draw'};
+					break;
+
+				case '(':  case '.':
+					cmd = {
+						cmd: 'loop',
+						repeat: 1,
+						cmds: []
+					};
+					expectRepeat = true;
+					break;
+
+				case 'Backspace':
+					if(inLoop) {
+						if(cmdList[cmdIdx].cmds.length > 0) {
+							cmdList[cmdIdx].cmds.splice(cmdList[cmdIdx].cmds.length - 1, 1);
+						}
+						else {
+							cmdList.splice(cmdIdx, 1);
+							inLoop = false;
+						}
+					}
+					else {
+						cmdList.splice(cmdIdx, 1);
+					}
+					break;
+			}
+
+			if(cmd) {
+				if(cmdIdx >= 0 && inLoop)
+					cmdList[cmdIdx].cmds.push(cmd);
+				else
+					cmdList.push(cmd);
+
+				if(cmd.cmd == 'loop')
+					inLoop = true;
+			}
+		}
+
+		cmdIdx = cmdList.length - 1;
+		cmdList = cmdList;
+
+		// console.log(evt.key);
+	}
+
+	const execCmd = (c) => {
+		switch(c.cmd) {
+			case 'up':
+			case 'down':
+			case 'left':
+			case 'right':
+				move(c.cmd);
+				break;
+
+			case 'chgcol':
+				changeColor();
+				break;
+
+			case 'draw':
+				draw();
+				break;
+
+			case 'loop':
+				for(let i = 0; i < c.repeat; i++) {
+					c.cmds.forEach(sc => execCmd(sc));
+				}
+				break;
+		}
+	};
+
+	const run = () => {
+		clear();
+		console.log(cmdList);
+		cmdList.forEach(c => execCmd(c));
+	}
+
+	const getCmdSymbol = (c) => {
+
+		let s = '';
+
+		switch(c.cmd) {
+			case 'up':
+				s = '↑';
+				break;
+			case 'down':
+				s = '↓';
+				break;
+			case 'left':
+				s = '←';
+				break;
+			case 'right':
+				s = '→';
+				break;
+			case 'chgcol':
+				s = '🗘';
+				break;
+			case 'draw':
+				s = '𝈊';
+				break;
+			case 'loop':
+				s = '<div class="block">' + c.cmds.map(sc => getCmdSymbol(sc)).join('<span class="dot">·</span>') + '</div><span class="mul">x' + c.repeat + '</span>';
+				break;
+		}
+
+		return s;
+	};
+
+	const load = () => {
+		const jsn = window.localStorage.getItem('graph');
+// console.log(jsn);
+		if(jsn) {
+			cmdList = JSON.parse(jsn);
+		}
+
+	}
+
+	const save = () => {
+		window.localStorage.setItem('graph', JSON.stringify(cmdList));
+	};
+
+	const clearCmds = () => {
+		clear();
+		cmdList = [];
+	}
+
+</script>
+
+<section class="cnt">
+	<div class="grid" style="grid-template-columns: repeat({cols}, 1fr);">
+		{#each grid as col, idx}
+			<div
+				class:current={idx == (x + y * cols)}
+				class="cell color{col}">
+			</div>
+		{/each}
+	</div>
+
+	<div class="cmd-area-cnt">
+		<div class="cmd-area" contenteditable="true"
+			on:keydown|preventDefault={() => {}}
+			on:keyup|preventDefault={onKeyup}>
+			{#each cmdList as c, idx}
+				 <div class="cmd" data-idx="idx">{@html getCmdSymbol(c)}</div>
+				 <span class="dot">·</span>
+			{/each}
+			<!-- {@html cmdList.map(c => getCmdSymbol(c)).join('<span class="dot">·</span>')} -->
+		</div>
+		<div class="buttons">
+			<div style="flex-grow: 1">
+				<button on:click|preventDefault={run}>esegui</button>
+				<button on:click|preventDefault={clearCmds}>pulisci</button>
+			</div>
+			<button on:click|preventDefault={save} style="margin-right: 0;">salva</button>
+		</div>
+	</div>
+</section>
+
+<style>
+	.cnt {
+		display: flex;
+		flex-flow: row;
+		align-items: start;
+		gap: 1rem;
+		width: 100%;
+	}
+
+	.grid {
+		display: grid;
+		gap: 1px 1px	;
+		background-color: #ccc;
+	}
+
+	.cell {
+		width: 2rem;
+		height: 2rem;
+		background-color: #f8f8f8;
+	}
+
+	.color1 {
+		background-color: #ccc;
+	}
+
+	.color2 {
+		background-color: #777;
+	}
+
+	.cell.current {
+		background-color:#0f03;
+	}
+
+	.cmd-area-cnt {
+		display: flex;
+		flex-flow: column;
+		width: 100%;
+		border: 1px solid #ccc;
+		border-radius: .2rem;
+		padding: .5rem;
+	}
+
+	.cmd-area {
+		flex-grow: 1;
+		font-size:1.5rem;
+		word-break: break-all;
+		font-family: monospace;
+
+		display: flex;
+		flex-flow: row wrap;
+		align-items: start;
+		gap: .2rem;
+		min-height: 5rem;
+	}
+
+	:global(.cmd-area .block) {
+		border: 1px solid #ccc;
+		border-radius: .2rem;
+		padding: 0 .2rem;
+		display: inline-flex;
+		margin: .1rem;
+		align-items: center;
+		/* background-color: #eee; */
+	}
+
+	:global(.cmd-area .mul) {
+		font-size: 1rem;
+		color: #555;
+	}
+
+	:global(.cmd-area .dot) {
+		font-size: 1.2rem;
+		color: #555;
+	}
+
+	.buttons {
+		display: flex;
+		background-color: #f1f1f1;
+		padding: .5rem;
+		margin: .5rem -.5rem -.5rem -.5rem;
+		border-radius: 0 0 .2rem .2rem;
+		gap: .5rem;
+	}
+</style>
