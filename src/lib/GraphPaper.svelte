@@ -271,7 +271,7 @@
 		<span class="cmd-symbol"><svg><use href="#icon:draw"></use></svg></span> Colora il blocco corrente
 	</li>
 	<li>
-		<span class="cmd-symbol">.</span> Inizia un loop. Tutti i comandi successivi faranno parte del ciclo, finchè non verrà digitato il numero di ripetizioni. Ad esempio ".↓5" crea un ciclo che muove la posizione 5 blocchi in basso.
+		<span class="cmd-symbol">.</span> Inizia un loop. Tutti i comandi successivi faranno parte del ciclo, finchè non verrà digitato il numero di ripetizioni. Ad esempio ".<svg><use href="#icon:arrow-down"></use></svg>5" crea un ciclo che muove la posizione 5 blocchi in basso.
 	</li>
 	<li>
 		<span class="cmd-symbol">Backspace</span> Cancella l'ultimo comando inserito
@@ -318,6 +318,11 @@
 		margin: .5rem 0;
 	}
 
+	svg {
+		width: 1rem;
+		height: 1rem;
+	}
+
 	.cmd-legend {
 		padding: 1rem 1rem;
 		margin: 0;
@@ -336,11 +341,6 @@
 		display: inline-block;
 		text-align: center;
 		margin-right: .5rem;
-	}
-
-	.cmd-legend .cmd-symbol svg {
-		width: 1rem;
-		height: 1rem;
 	}
 
 	.cnt {
@@ -402,10 +402,6 @@
 		box-shadow: -1px -1px 3px rgba(0,0,0,.2) inset;
 	}
 
-	:global(.cmd-area svg) {
-		width: 1rem;
-		height: 1rem;
-	}
 	.placeholder {
 		color: #555;
 		font-size: 1rem;
