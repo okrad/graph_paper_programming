@@ -57,6 +57,8 @@
 		x = 0;
 		y = 0;
 		cmdIdx = -1;
+		inLoop = false;
+		expectRepeat = false;
 		grid = grid;
 	}
 
@@ -65,11 +67,22 @@
 		let cmd = null;
 
 		if(expectRepeat && !isNaN(evt.key)) {
-			expectRepeat = false;
-			cmdList[cmdIdx].repeat = parseInt(evt.key);
-			inLoop = false;
+			// expectRepeat = false;
+			if(cmdList[cmdIdx].repeat > 0) {
+				cmdList[cmdIdx].repeat = cmdList[cmdIdx].repeat * 10 + parseInt(evt.key);
+			}
+			else {
+				cmdList[cmdIdx].repeat = parseInt(evt.key);
+			}
+			// inLoop = false;
 		}
 		else {
+
+			if(expectRepeat && cmdList[cmdIdx].repeat > 0) {
+				expectRepeat = false;
+				inLoop = false;
+			}
+
 			switch(evt.key) {
 				case 'ArrowUp':
 					cmd = {cmd: 'up'};
@@ -98,7 +111,7 @@
 				case '(':  case '.':
 					cmd = {
 						cmd: 'loop',
-						repeat: 1,
+						repeat: 0,
 						cmds: []
 					};
 					expectRepeat = true;
@@ -164,7 +177,6 @@
 
 	const run = () => {
 		clear();
-		console.log(cmdList);
 		cmdList.forEach(c => execCmd(c));
 	}
 
