@@ -1,5 +1,11 @@
 <script>
 	import { onMount } from 'svelte';
+	import drawIcon from '../../assets/img/draw.svg?raw'
+	import changeColorIcon from '../../assets/img/refresh.svg?raw'
+	import arrowRightIcon from '../../assets/img/arrow-right.svg?raw'
+	import arrowLeftIcon from '../../assets/img/arrow-left.svg?raw'
+	import arrowDownIcon from '../../assets/img/arrow-down.svg?raw'
+	import arrowUpIcon from '../../assets/img/arrow-up.svg?raw'
 
 	export let rows = 16;
 	export let cols = 16;
@@ -186,22 +192,22 @@
 
 		switch(c.cmd) {
 			case 'up':
-				s = '↑';
+				s = '<svg><use href="#icon:arrow-up"></use></svg>';
 				break;
 			case 'down':
-				s = '↓';
+				s = '<svg><use href="#icon:arrow-down"></use></svg>';
 				break;
 			case 'left':
-				s = '←';
+				s = '<svg><use href="#icon:arrow-left"></use></svg>';
 				break;
 			case 'right':
-				s = '→';
+				s = '<svg><use href="#icon:arrow-right"></use></svg>';
 				break;
 			case 'chgcol':
-				s = '🗘';
+				s = '<svg><use href="#icon:chgcolor"></use></svg>';
 				break;
 			case 'draw':
-				s = '𝈊';
+				s = '<svg><use href="#icon:draw"></use></svg>';
 				break;
 			case 'loop':
 				s = '<div class="block">' + c.cmds.map(sc => getCmdSymbol(sc)).join('<span class="dot">·</span>') + '</div><span class="mul">x' + c.repeat + '</span>';
@@ -232,28 +238,37 @@
 
 </script>
 
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+	<symbol id="icon:draw">{@html drawIcon}</symbol>
+	<symbol id="icon:chgcolor">{@html changeColorIcon}</symbol>
+	<symbol id="icon:arrow-right">{@html arrowRightIcon}</symbol>
+	<symbol id="icon:arrow-left">{@html arrowLeftIcon}</symbol>
+	<symbol id="icon:arrow-down">{@html arrowDownIcon}</symbol>
+	<symbol id="icon:arrow-up">{@html arrowUpIcon}</symbol>
+</svg>
+
 <p class="intro">
 	Digita i comandi nel riquadro sottostante, poi premi il pulsante "esegui" per vedere il risultato.
 </p>
 <p>Comandi disponibili:</p>
 <ul class="cmd-legend">
 	<li>
-		<span class="cmd-symbol">↑</span> Muoviti verso l'alto
+		<span class="cmd-symbol"><svg><use href="#icon:arrow-up"></use></svg></span> Muoviti verso l'alto
 	</li>
 	<li>
-		<span class="cmd-symbol">↓</span> Muoviti verso il basso
+		<span class="cmd-symbol"><svg><use href="#icon:arrow-down"></use></svg></span> Muoviti verso il basso
 	</li>
 	<li>
-		<span class="cmd-symbol">←</span> Muoviti a sinistra
+		<span class="cmd-symbol"><svg><use href="#icon:arrow-left"></use></svg></span> Muoviti a sinistra
 	</li>
 	<li>
-		<span class="cmd-symbol">→</span> Muoviti a destra
+		<span class="cmd-symbol"><svg><use href="#icon:arrow-right"></use></svg></span> Muoviti a destra
 	</li>
 	<li>
-		<span class="cmd-symbol">c</span> Cambia colore
+		<span class="cmd-symbol"><svg><use href="#icon:chgcolor"></use></svg></span> Cambia colore
 	</li>
 	<li>
-		<span class="cmd-symbol">m</span> Colora il blocco corrente
+		<span class="cmd-symbol"><svg><use href="#icon:draw"></use></svg></span> Colora il blocco corrente
 	</li>
 	<li>
 		<span class="cmd-symbol">.</span> Inizia un loop. Tutti i comandi successivi faranno parte del ciclo, finchè non verrà digitato il numero di ripetizioni. Ad esempio ".↓5" crea un ciclo che muove la posizione 5 blocchi in basso.
@@ -323,6 +338,11 @@
 		margin-right: .5rem;
 	}
 
+	.cmd-legend .cmd-symbol svg {
+		width: 1rem;
+		height: 1rem;
+	}
+
 	.cnt {
 		display: flex;
 		flex-flow: column;
@@ -382,6 +402,10 @@
 		box-shadow: -1px -1px 3px rgba(0,0,0,.2) inset;
 	}
 
+	:global(.cmd-area svg) {
+		width: 1rem;
+		height: 1rem;
+	}
 	.placeholder {
 		color: #555;
 		font-size: 1rem;
