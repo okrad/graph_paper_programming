@@ -325,7 +325,7 @@
 
 	.cnt {
 		display: flex;
-		flex-flow: row;
+		flex-flow: column;
 		align-items: start;
 		gap: 1rem;
 		width: 100%;
@@ -421,5 +421,11 @@
 		/* margin: .5rem -.5rem -.5rem -.5rem; */
 		border-radius: 0 0 .2rem .2rem;
 		gap: .5rem;
+	}
+
+	@media screen and (min-width: 85em) {
+		.cnt {
+			flex-flow: row;
+		}
 	}
 </style>
