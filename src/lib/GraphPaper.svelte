@@ -10,6 +10,7 @@
 	let cmdIdx = -1;
 	let expectRepeat = false;
 	let inLoop = false;
+	let showPlaceholder;
 
 	let cmdList = [];
 
@@ -216,6 +217,10 @@
 		cmdList = [];
 	}
 
+	$: {
+		showPlaceholder = cmdList.length == 0;
+	}
+
 </script>
 
 <section class="cnt">
@@ -230,13 +235,18 @@
 
 	<div class="cmd-area-cnt">
 		<div class="cmd-area" contenteditable="true"
+			on:click={() => {showPlaceholder = false}}
+			on:blur={() => {showPlaceholder = cmdList.length == 0}}
 			on:keydown|preventDefault={() => {}}
 			on:keyup|preventDefault={onKeyup}>
-			{#each cmdList as c, idx}
-				 <div class="cmd" data-idx="idx">{@html getCmdSymbol(c)}</div>
-				 <span class="dot">·</span>
-			{/each}
-			<!-- {@html cmdList.map(c => getCmdSymbol(c)).join('<span class="dot">·</span>')} -->
+			{#if cmdList.length > 0}
+				{#each cmdList as c, idx}
+					<div class="cmd" data-idx="idx">{@html getCmdSymbol(c)}</div>
+					<span class="dot">·</span>
+				{/each}
+			{:else if showPlaceholder}
+				<p class="placeholder">Digita qui i comandi...</p>
+			{/if}
 		</div>
 		<div class="buttons">
 			<div style="flex-grow: 1">
@@ -287,7 +297,6 @@
 		width: 100%;
 		border: 1px solid #ccc;
 		border-radius: .2rem;
-		padding: .5rem;
 	}
 
 	.cmd-area {
@@ -298,9 +307,26 @@
 
 		display: flex;
 		flex-flow: row wrap;
-		align-items: start;
+		align-items: center;
 		gap: .2rem;
 		min-height: 5rem;
+	}
+
+	.cmd-area:focus {
+		outline: none;
+		background-color: #f8f8f8;
+		box-shadow: -1px -1px 3px rgba(0,0,0,.2) inset;
+	}
+
+	.placeholder {
+		color: #555;
+		font-size: 1rem;
+		padding: .5rem;
+	}
+
+	:global(.cmd-area .cmd) {
+		display: flex;
+		align-items: center;
 	}
 
 	:global(.cmd-area .block) {
@@ -310,7 +336,8 @@
 		display: inline-flex;
 		margin: .1rem;
 		align-items: center;
-		/* background-color: #eee; */
+		min-width: 1rem;
+		min-height: 1em;
 	}
 
 	:global(.cmd-area .mul) {
@@ -327,7 +354,7 @@
 		display: flex;
 		background-color: #f1f1f1;
 		padding: .5rem;
-		margin: .5rem -.5rem -.5rem -.5rem;
+		/* margin: .5rem -.5rem -.5rem -.5rem; */
 		border-radius: 0 0 .2rem .2rem;
 		gap: .5rem;
 	}
