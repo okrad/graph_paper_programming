@@ -200,28 +200,56 @@
 	};
 
 	const load = () => {
-		const jsn = window.localStorage.getItem('graph');
-// console.log(jsn);
-		if(jsn) {
+		const jsn = window.localStorage.getItem('graph_paper_programming');
+		if(jsn)
 			cmdList = JSON.parse(jsn);
-		}
-
-	}
+	};
 
 	const save = () => {
-		window.localStorage.setItem('graph', JSON.stringify(cmdList));
+		window.localStorage.setItem('graph_paper_programming', JSON.stringify(cmdList));
 	};
 
 	const clearCmds = () => {
 		clear();
 		cmdList = [];
-	}
+	};
 
 	$: {
 		showPlaceholder = cmdList.length == 0;
 	}
 
 </script>
+
+<p class="intro">
+	Digita i comandi nel riquadro sottostante, poi premi il pulsante "esegui" per vedere il risultato.
+</p>
+<p>Comandi disponibili:</p>
+<ul class="cmd-legend">
+	<li>
+		<span class="cmd-symbol">↑</span> Muoviti verso l'alto
+	</li>
+	<li>
+		<span class="cmd-symbol">↓</span> Muoviti verso il basso
+	</li>
+	<li>
+		<span class="cmd-symbol">←</span> Muoviti a sinistra
+	</li>
+	<li>
+		<span class="cmd-symbol">→</span> Muoviti a destra
+	</li>
+	<li>
+		<span class="cmd-symbol">c</span> Cambia colore
+	</li>
+	<li>
+		<span class="cmd-symbol">m</span> Colora il blocco corrente
+	</li>
+	<li>
+		<span class="cmd-symbol">.</span> Inizia un loop. Tutti i comandi successivi faranno parte del ciclo, finchè non verrà digitato il numero di ripetizioni. Ad esempio ".↓5" crea un ciclo che muove la posizione 5 blocchi in basso.
+	</li>
+	<li>
+		<span class="cmd-symbol">Backspace</span> Cancella l'ultimo comando inserito
+	</li>
+</ul>
 
 <section class="cnt">
 	<div class="grid" style="grid-template-columns: repeat({cols}, 1fr);">
@@ -259,6 +287,30 @@
 </section>
 
 <style>
+	p {
+		margin: .5rem 0;
+	}
+
+	.cmd-legend {
+		padding: 1rem 1rem;
+		margin: 0;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		list-style-type: none;
+		gap: .5rem;
+	}
+
+	.cmd-legend .cmd-symbol {
+		background: #f1f1f1;
+		border: 1px solid #ccc;
+		border-radius: .2rem;
+		padding: .2rem;
+		min-width: 1rem;
+		display: inline-block;
+		text-align: center;
+		margin-right: .5rem;
+	}
+
 	.cnt {
 		display: flex;
 		flex-flow: row;
