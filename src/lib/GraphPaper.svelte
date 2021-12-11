@@ -434,11 +434,15 @@
 		color: #555;
 	}
 
+	:global(.cmd-area svg) {
+		width: 1rem;
+		height: 1rem;
+	}
+
 	.buttons {
 		display: flex;
 		background-color: #f1f1f1;
 		padding: .5rem;
-		/* margin: .5rem -.5rem -.5rem -.5rem; */
 		border-radius: 0 0 .2rem .2rem;
 		gap: .5rem;
 	}
