@@ -14,7 +14,6 @@
 	let y = 0;
 	let colorIdx = 1;
 	let cmdIdx = -1;
-	let expectRepeat = false;
 	let inLoop = false;
 	let showPlaceholder;
 
@@ -64,7 +63,6 @@
 		y = 0;
 		cmdIdx = -1;
 		inLoop = false;
-		expectRepeat = false;
 		grid = grid;
 	}
 
@@ -72,20 +70,19 @@
 
 		let cmd = null;
 
-		if(expectRepeat && !isNaN(evt.key)) {
-			// expectRepeat = false;
-			if(cmdList[cmdIdx].repeat > 0) {
-				cmdList[cmdIdx].repeat = cmdList[cmdIdx].repeat * 10 + parseInt(evt.key);
+		if(!isNaN(evt.key)) {
+			if(inLoop) {
+				if(cmdList[cmdIdx].repeat > 0) {
+					cmdList[cmdIdx].repeat = cmdList[cmdIdx].repeat * 10 + parseInt(evt.key);
+				}
+				else {
+					cmdList[cmdIdx].repeat = parseInt(evt.key);
+				}
 			}
-			else {
-				cmdList[cmdIdx].repeat = parseInt(evt.key);
-			}
-			// inLoop = false;
 		}
 		else {
 
-			if(expectRepeat && cmdList[cmdIdx].repeat > 0) {
-				expectRepeat = false;
+			if(inLoop && cmdList[cmdIdx].repeat > 0) {
 				inLoop = false;
 			}
 
@@ -120,7 +117,6 @@
 						repeat: 0,
 						cmds: []
 					};
-					expectRepeat = true;
 					break;
 
 				case 'Backspace':
@@ -152,8 +148,6 @@
 
 		cmdIdx = cmdList.length - 1;
 		cmdList = cmdList;
-
-		// console.log(evt.key);
 	}
 
 	const execCmd = (c) => {
@@ -235,7 +229,6 @@
 	$: {
 		showPlaceholder = cmdList.length == 0;
 	}
-
 </script>
 
 <svg style="display:none" xmlns="http://www.w3.org/2000/svg">
@@ -265,10 +258,10 @@
 		<span class="cmd-symbol"><svg><use href="#icon:arrow-right"></use></svg></span> Muoviti a destra
 	</li>
 	<li>
-		<span class="cmd-symbol"><svg><use href="#icon:chgcolor"></use></svg></span> Cambia colore
+		<span class="cmd-symbol">c</span> Cambia colore
 	</li>
 	<li>
-		<span class="cmd-symbol"><svg><use href="#icon:draw"></use></svg></span> Colora il blocco corrente
+		<span class="cmd-symbol">m</span> Colora il blocco corrente
 	</li>
 	<li>
 		<span class="cmd-symbol">.</span> Inizia un loop. Tutti i comandi successivi faranno parte del ciclo, finchè non verrà digitato il numero di ripetizioni. Ad esempio ".<svg><use href="#icon:arrow-down"></use></svg>5" crea un ciclo che muove la posizione 5 blocchi in basso.
@@ -308,7 +301,7 @@
 				<button on:click|preventDefault={run}>esegui</button>
 				<button on:click|preventDefault={clearCmds}>pulisci</button>
 			</div>
-			<button on:click|preventDefault={save} style="margin-right: 0;">salva</button>
+			<button on:click|preventDefault={save}>salva</button>
 		</div>
 	</div>
 </section>
